@@ -2,6 +2,7 @@ require('dotenv').config();
 const xlsx = require("xlsx");
 const express = require('express')
 const request = require('request')
+const path = require('path')
 
 
 const file = xlsx.readFile("병역지정업체검색_20220918.xls")
@@ -33,10 +34,12 @@ app.get('/', function (req, res) {
     const json = xlsx.utils.sheet_to_json(file.Sheets[file.SheetNames[0]]);
 
     // Print the value
-    json.forEach((row) => {
+    /*json.forEach((row) => {
         res.write("<p>" + row['업체명'] + ' : ' + row['주소'] + "</p>");
     });
-    res.end();
+    res.end();*/
+
+    res.sendFile(path.join(__dirname, '/main.html'));
 });
 
 
