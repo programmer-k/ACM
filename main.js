@@ -5,10 +5,11 @@ const request = require('request');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const { resolve } = require('path');
+const favicon = require('serve-favicon');
 
 
 const app = express();
+app.use(favicon(path.join(__dirname, "favicon.ico")));
 
 
 async function requestGeocoding(addressString) {
@@ -126,7 +127,6 @@ async function writeLocation(csvFile) {
 
     fs.writeFileSync('lat.csv', contents);
 }
-
 
 app.get('/', function (req, res) {
     // Set the header
