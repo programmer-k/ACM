@@ -8,7 +8,6 @@ const fs = require('fs');
 const { resolve } = require('path');
 
 
-const file = xlsx.readFile("병역지정업체검색_20220918.xls")
 const app = express();
 
 
@@ -36,7 +35,7 @@ async function requestGeocoding(addressString) {
 
 function crawl() {
     (async () => {
-        const browser = await puppeteer.launch({headless: false, slowMo: 10});
+        const browser = await puppeteer.launch({slowMo: 5});
         const page = await browser.newPage();
         page.setViewport({
             width: 1920,
@@ -81,18 +80,19 @@ function crawl() {
         console.log("length", links.length);
         
         //const xlsxFile = xlsx.writeFile("병역지정업체검색_20220918.csv")
-        let contents = 'Address\n';
+        let contents = 'Company Name,Address\n';
         for (const link of links) {
             await page.goto(link);
             await page.waitForSelector('table.table_row tbody tr td');
             const addressElement = await page.$$('table.table_row tbody tr td');
             //console.log(addressElement[1]);
-            const value = await page.evaluate(el => el.textContent, addressElement[1]);
-            console.log(value);
-            contents += value + '\n';
+            const companyName = await page.evaluate(el => el.textContent, addressElement[0]);
+            const address = await page.evaluate(el => el.textContent, addressElement[1]);
+            console.log(companyName, address);
+            contents += companyName + ',' + address + '\n';
         };
         fs.writeFileSync('data.csv', contents);
-        fs.close('data.csv');
+        //fs.close('data.csv');
     })();
 }
 
@@ -102,8 +102,9 @@ async function writeLocation() {
     let lines = data.toString().split('\n').slice(1);
     let location = [];
     for (line of lines) {
+        const address = line.split(',')[1];
         console.log(line);
-        const ret = JSON.parse(await requestGeocoding(line));
+        const ret = JSON.parse(await requestGeocoding(address));
         console.log(ret);
         //console.log(JSON.parse(ret).addresses);
         try {
@@ -145,12 +146,38 @@ app.get('/', function (req, res) {
         let log = spli[spli.length - 2];
         console.log(line);
         
-        if (cnt == 844)
+        if (alt == undefined || log == undefined)
             break;
         res.write('var marker' + cnt.toString() + ' = new naver.maps.Marker({position: new naver.maps.LatLng(' + alt + "," + log +' ), map: map});\n');
+
+        res.write("var contentString" + cnt.toString() + " = [");
+        res.write("    '<div class=\"iw_inner\">',");
+        res.write("    '   <h4>" + spli[0] + "</h4>',");
+        //res.write("    '   <p>서울특별시 중구 태평로1가 31 | 서울특별시 중구 세종대로 110 서울특별시청',");
+        //res.write("    '   </p>',");
+        res.write("    '</div>'");
+        res.write("].join('');");
+
+        res.write("var infowindow" + cnt.toString() + " = new naver.maps.InfoWindow({");
+        res.write("    content: contentString" + cnt.toString());
+        res.write("});");
+
+        res.write('naver.maps.Event.addListener(marker' + cnt.toString() + ', "click", function(e) {\n');
+        res.write('    if (infowindow' + cnt.toString() + '.getMap()) {');
+        res.write('        infowindow' + cnt.toString() + '.close();');
+        res.write('    } else {');
+        res.write('        infowindow' + cnt.toString() + '.open(map, marker' + cnt.toString() + ');');
+        res.write('    }');
+        res.write('});');
+
+        res.write("infowindow" + cnt.toString() + ".open(map, marker" + cnt.toString() + ");");
         cnt += 1;
     }
-    res.write('</script></body></html>');
+
+
+
+    let htm2 = fs.readFileSync('main2.html', {encoding:'utf8', flag:'r'}).toString();
+    res.write(htm2);
     res.end();
     //res.write()
 });
@@ -158,8 +185,8 @@ app.get('/', function (req, res) {
 
 app.listen(3000, () => {
     console.log("Starting the server..")
-    //requestGeocoding();
     //crawl();
+    //requestGeocoding();
     //writeLocation();
 
 });
