@@ -163,9 +163,3 @@ app.listen(3000, () => {
     //writeLocation();
 
 });
-
-// TODO
-// 1. Crawl the address: Current data in xls file cannot be used.
-// 2. Convert the address into altitude and latitude.
-// 3. Show them in map.
-// 4. Show additional information when clicked.
