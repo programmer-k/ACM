@@ -1,2 +1,4 @@
 # ACM
-(Alternative Military Service) Agent Company Map
+Awesome Company Map (for Alternative Military Service) 
+
+Live Site: [http://acm.ddnsking.com](http://acm.ddnsking.com)
