@@ -187,7 +187,7 @@ app.get('/', function (req, res) {
 
     res.write('</script>\n');
     res.write('<p><center>Views: ');
-    countapi.visits().then((result) => {
+    countapi.visits('acm.ddnsking.com').then((result) => {
         res.write(result.value.toString());
         console.log(result.value);
 
@@ -255,7 +255,7 @@ app.get('/grad', function (req, res) {
 
     res.write('</script>\n');
     res.write('<p><center>Views: ');
-    countapi.visits().then((result) => {
+    countapi.visits('acm.ddnsking.com').then((result) => {
         res.write(result.value.toString());
         console.log(result.value);
 
