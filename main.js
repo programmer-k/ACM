@@ -6,6 +6,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const favicon = require('serve-favicon');
+const countapi = require('countapi-js');
 
 
 const app = express();
@@ -184,12 +185,16 @@ app.get('/', function (req, res) {
         cnt += 1;
     }
 
+    res.write('</script>\n');
+    res.write('<p><center>Views: ');
+    countapi.visits().then((result) => {
+        res.write(result.value.toString());
+        console.log(result.value);
 
-
-    let htm2 = fs.readFileSync('main2.html', {encoding:'utf8', flag:'r'}).toString();
-    res.write(htm2);
-    res.end();
-    //res.write()
+        res.write(' | Source code available at <a href="https://github.com/programmer-k/ACM">Github</a>.</center></p>');
+        res.write('</body></html>');
+        res.end();
+      });
 });
 
 app.get('/grad', function (req, res) {
@@ -248,12 +253,16 @@ app.get('/grad', function (req, res) {
         cnt += 1;
     }
 
+    res.write('</script>\n');
+    res.write('<p><center>Views: ');
+    countapi.visits().then((result) => {
+        res.write(result.value.toString());
+        console.log(result.value);
 
-
-    let htm2 = fs.readFileSync('main2.html', {encoding:'utf8', flag:'r'}).toString();
-    res.write(htm2);
-    res.end();
-    //res.write()
+        res.write(' | Source code available at <a href="https://github.com/programmer-k/ACM">Github</a>.</center></p>');
+        res.write('</body></html>');
+        res.end();
+      });
 });
 
 app.listen(3000, () => {
@@ -262,5 +271,4 @@ app.listen(3000, () => {
     //requestGeocoding();
     //writeLocation('data_undergrad.csv');
     //writeLocation('data_grad.csv');
-
 });
